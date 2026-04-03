@@ -28,7 +28,7 @@ from openai import OpenAI
 # ---------------------------------------------------------------------------
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME   = os.getenv("MODEL_NAME", "meta-llama/Llama-3.1-8B-Instruct")
-API_KEY      = os.getenv("HF_TOKEN") or os.getenv("API_KEY", "hf_dummy")
+API_KEY      = os.getenv("HF_TOKEN")
 ENV_BASE_URL = os.getenv("ENV_BASE_URL", "http://localhost:7860")
 
 MAX_STEPS   = 25
