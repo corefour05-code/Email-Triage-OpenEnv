@@ -1,0 +1,72 @@
+name: email-triage-env
+version: "1.0.0"
+description: >
+  A real-world email triage environment where an AI agent must classify,
+  prioritize, and route incoming emails. Simulates a core business operations task.
+author: ThinkRay
+tags:
+  - openenv
+  - email
+  - triage
+  - business
+  - nlp
+  - real-world
+
+tasks:
+  - id: task_easy
+    name: "Email Priority Classification"
+    description: "Classify each email as URGENT, NORMAL, or LOW priority."
+    difficulty: easy
+    max_steps: 10
+
+  - id: task_medium
+    name: "Email Triage with Routing"
+    description: "Classify priority AND route to the correct department."
+    difficulty: medium
+    max_steps: 15
+
+  - id: task_hard
+    name: "Full Triage with Reply Draft"
+    description: "Classify priority, route to department, AND draft a reply."
+    difficulty: hard
+    max_steps: 20
+
+observation_space:
+  type: object
+  fields:
+    - name: email_id
+      type: string
+    - name: subject
+      type: string
+    - name: sender
+      type: string
+    - name: body
+      type: string
+    - name: timestamp
+      type: string
+    - name: task_id
+      type: string
+    - name: emails_remaining
+      type: integer
+    - name: current_score
+      type: float
+    - name: step
+      type: integer
+
+action_space:
+  type: object
+  fields:
+    - name: priority
+      type: string
+      enum: [URGENT, NORMAL, LOW]
+    - name: department
+      type: string
+      enum: [Sales, Support, Billing, HR, Engineering, None]
+    - name: reply
+      type: string
+      description: "Optional reply draft (scored in task_hard)"
+
+reward:
+  type: float
+  range: [0.0, 1.0]
+  description: "Per-email reward. Episode score is mean across all steps."

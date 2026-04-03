@@ -1,0 +1,10 @@
+{
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "api_base_url": "https://router.huggingface.co/v1",
+  "scores": {
+    "task_easy": 0.8333333333333334,
+    "task_medium": 0.95,
+    "task_hard": 0.9136599999999999
+  },
+  "average": 0.8989977777777778
+}
