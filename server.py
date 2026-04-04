@@ -160,7 +160,7 @@ def list_tasks():
 
 
 @app.post("/reset", response_model=Observation)
-def reset(request: ResetRequest):
+def reset(request: ResetRequest = ResetRequest()):
     try:
         obs = env.reset(task_id=request.task_id)
         return obs
