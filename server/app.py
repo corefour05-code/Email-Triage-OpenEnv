@@ -11,8 +11,8 @@ from typing import Optional
 from pydantic import BaseModel
 import uvicorn
 
-from env import EmailTriageEnv
-from models import Action, Observation, StepResult, EpisodeState
+from .env import EmailTriageEnv
+from .models import Action, Observation, StepResult, EpisodeState
 
 app = FastAPI(
     title="Email Triage OpenEnv",
@@ -188,5 +188,9 @@ def state():
     return env.state()
 
 
+def main():
+    uvicorn.run("server.app:app", host="0.0.0.0", port=7860, reload=False)
+
+
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="0.0.0.0", port=7860, reload=False)
+    main()
