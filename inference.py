@@ -23,23 +23,18 @@ import requests
 from openai import OpenAI
 
 
-API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
-MODEL_NAME   = os.getenv("MODEL_NAME", "meta-llama/Llama-3.1-8B-Instruct")
-# Prioritize API_KEY as requested by Phase 2 validator
+# Config from environment variables (using 'or' to catch empty strings)
+API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
+MODEL_NAME   = os.getenv("MODEL_NAME") or "meta-llama/Llama-3.1-8B-Instruct"
 API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN")
-ENV_BASE_URL = os.getenv("ENV_BASE_URL", "http://localhost:7860")
+ENV_BASE_URL = os.getenv("ENV_BASE_URL") or "http://localhost:7860"
 
 MAX_STEPS   = 25
 TEMPERATURE = 0.1
 MAX_TOKENS  = 300
 TASKS       = ["task_easy", "task_medium", "task_hard"]
-
-
-# Mandatory client initialization per Phase 2 requirements
-if not API_KEY:
-    print("[WARN] API_KEY/HF_TOKEN is missing. Validator may fail.")
-
-client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY or "not-provided")
+# Placeholder for client
+client = None
 
 
 SYSTEM_PROMPT = """You are an expert email triage assistant.
@@ -216,13 +211,17 @@ def run_task(task_id: str) -> float:
 
 
 def main():
+    global client
     print("\n" + "="*55)
     print("  EMAIL TRIAGE OPENENV - BASELINE INFERENCE")
     print("="*55)
-    print(f"  Model:   {MODEL_NAME}")
-    print(f"  API:     {API_BASE_URL}")
-    print(f"  Env:     {ENV_BASE_URL}")
-    print("="*55)
+    
+    # Initialize client safely inside main
+    try:
+        client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY or "no-key")
+    except Exception as e:
+        print(f"[ERROR] Could not initialize OpenAI client: {e}")
+        # We don't exit/crash, just continue and let the health check fail
 
     try:
         r = requests.get(f"{ENV_BASE_URL}/health", timeout=10)
