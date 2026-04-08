@@ -25,7 +25,8 @@ from openai import OpenAI
 
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME   = os.getenv("MODEL_NAME", "meta-llama/Llama-3.1-8B-Instruct")
-API_KEY      = os.getenv("HF_TOKEN")
+# Prioritize API_KEY as requested by Phase 2 validator
+API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN")
 ENV_BASE_URL = os.getenv("ENV_BASE_URL", "http://localhost:7860")
 
 MAX_STEPS   = 25
@@ -34,9 +35,11 @@ MAX_TOKENS  = 300
 TASKS       = ["task_easy", "task_medium", "task_hard"]
 
 
-# Use a dummy key if the token is missing to prevent initialization crash
-effective_api_key = API_KEY if API_KEY else "not_provided"
-client = OpenAI(base_url=API_BASE_URL, api_key=effective_api_key)
+# Mandatory client initialization per Phase 2 requirements
+if not API_KEY:
+    print("[WARN] API_KEY/HF_TOKEN is missing. Validator may fail.")
+
+client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY or "not-provided")
 
 
 SYSTEM_PROMPT = """You are an expert email triage assistant.
