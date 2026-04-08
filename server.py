@@ -2,7 +2,6 @@ from __future__ import annotations
 import sys
 import os
 
-# Fix module resolution
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fastapi import FastAPI, HTTPException
@@ -162,7 +161,6 @@ def list_tasks():
 
 @app.post("/reset", response_model=Observation)
 def reset(request: Optional[ResetRequest] = None):
-    # This makes the body totally optional for automated checkers
     task_id = "task_easy"
     if request and hasattr(request, "task_id") and request.task_id:
         task_id = request.task_id

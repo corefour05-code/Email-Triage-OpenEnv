@@ -11,14 +11,12 @@ def _score_reply(reply: Optional[str], keywords: List[str], email_body: str) -> 
     words = reply.split()
     word_count = len(words)
 
-    # 1. Keyword coverage (up to 0.10)
     if keywords:
         matched = sum(1 for kw in keywords if kw.lower() in reply_lower)
         keyword_score = min(matched / max(len(keywords), 1), 1.0) * 0.10
     else:
         keyword_score = 0.08
 
-    # 2. Tone check (up to 0.08)
     negative_phrases = [
         "i can't", "not my problem", "deal with it", "too bad",
         "whatever", "i don't care", "stupid", "idiot"
@@ -31,7 +29,6 @@ def _score_reply(reply: Optional[str], keywords: List[str], email_body: str) -> 
     has_positive = sum(1 for p in positive_phrases if p in reply_lower)
     tone_score = 0.0 if has_negative else min(has_positive / 3, 1.0) * 0.08
 
-    # 3. Length check (up to 0.07)
     if 10 <= word_count <= 120:
         length_score = 0.07
     elif word_count < 5:

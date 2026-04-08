@@ -2,7 +2,6 @@ from __future__ import annotations
 import sys
 import os
 
-# Fix module resolution
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fastapi import FastAPI, HTTPException
