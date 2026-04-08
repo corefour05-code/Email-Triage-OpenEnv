@@ -23,18 +23,27 @@ import requests
 from openai import OpenAI
 
 
-# Config from environment variables (using 'or' to catch empty strings)
-API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
-MODEL_NAME   = os.getenv("MODEL_NAME") or "meta-llama/Llama-3.1-8B-Instruct"
-API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN")
+# Config from environment variables (Mandatory per Phase 2 Spec)
+try:
+    API_BASE_URL = os.environ["API_BASE_URL"]
+    API_KEY      = os.environ["API_KEY"]
+    MODEL_NAME   = os.environ["MODEL_NAME"]
+except KeyError as e:
+    # If variables are missing, we fall back to local defaults for your testing
+    # but the validator will provide these.
+    API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
+    API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN")
+    MODEL_NAME   = os.getenv("MODEL_NAME") or "meta-llama/Llama-3.1-8B-Instruct"
+
 ENV_BASE_URL = os.getenv("ENV_BASE_URL") or "http://localhost:7860"
 
 MAX_STEPS   = 25
 TEMPERATURE = 0.1
 MAX_TOKENS  = 300
 TASKS       = ["task_easy", "task_medium", "task_hard"]
-# Placeholder for client
-client = None
+
+# Initialize client exactly as requested in Phase 2 instructions
+client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
 
 SYSTEM_PROMPT = """You are an expert email triage assistant.
@@ -211,17 +220,13 @@ def run_task(task_id: str) -> float:
 
 
 def main():
-    global client
     print("\n" + "="*55)
     print("  EMAIL TRIAGE OPENENV - BASELINE INFERENCE")
     print("="*55)
-    
-    # Initialize client safely inside main
-    try:
-        client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY or "no-key")
-    except Exception as e:
-        print(f"[ERROR] Could not initialize OpenAI client: {e}")
-        # We don't exit/crash, just continue and let the health check fail
+    print(f"  Model:   {MODEL_NAME}")
+    print(f"  API:     {API_BASE_URL}")
+    print(f"  Env:     {ENV_BASE_URL}")
+    print("="*55)
 
     try:
         r = requests.get(f"{ENV_BASE_URL}/health", timeout=10)
