@@ -23,24 +23,19 @@ import requests
 from openai import OpenAI
 
 
-# Config from environment variables (Hybrid fallback logic)
-API_BASE_URL = os.getenv("API_BASE_URL") or os.getenv("BASE_URL") or "https://router.huggingface.co/v1"
-API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN") or "no-key-found"
-MODEL_NAME   = os.getenv("MODEL_NAME") or "meta-llama/Llama-3.1-8B-Instruct"
-ENV_BASE_URL = os.getenv("ENV_BASE_URL") or "http://localhost:7860"
+# Config from environment variables (STRICT - NO FALLBACKS)
+API_BASE_URL = os.environ.get("API_BASE_URL")
+API_KEY      = os.environ.get("API_KEY")
+MODEL_NAME   = os.environ.get("MODEL_NAME")
+ENV_BASE_URL = os.environ.get("ENV_BASE_URL") or "http://localhost:7860"
 
 MAX_STEPS   = 25
 TEMPERATURE = 0.1
 MAX_TOKENS  = 300
 TASKS       = ["task_easy", "task_medium", "task_hard"]
 
-# Initialize Client safely
-client = None
-try:
-    # We follow the judges' requested setup exactly inside a try block
-    client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
-except Exception as e:
-    print(f"[WARN] OpenAI client initialization deferred/failed: {e}")
+# Initialize Client exactly as commanded by Validator
+client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
 
 SYSTEM_PROMPT = """You are an expert email triage assistant.
@@ -92,18 +87,6 @@ def env_step(priority: str, department: str, reply: str = None) -> dict:
 
 
 def call_llm(obs: dict) -> dict:
-    global client
-    
-    # Emergency re-initialization if global client is missing
-    if client is None:
-        try:
-            client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
-        except:
-            pass
-
-    if not client:
-        return {"priority": "NORMAL", "department": "None", "reply": "Connection error."}
-
     user_msg = f"""Triage this email:
 
 From: {obs['sender']}
