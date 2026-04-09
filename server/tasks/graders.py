@@ -47,18 +47,18 @@ def grade_easy(action: Action, ground_truth: dict) -> Reward:
 
     if correct_priority:
         return Reward(
-            total=1.0,
-            priority_score=1.0,
-            routing_score=0.0,
-            reply_score=0.0,
+            total=0.99,
+            priority_score=0.99,
+            routing_score=0.01,
+            reply_score=0.01,
             feedback=f"Correct priority ({action.priority}).",
         )
     else:
         return Reward(
-            total=0.0,
-            priority_score=0.0,
-            routing_score=0.0,
-            reply_score=0.0,
+            total=0.01,
+            priority_score=0.01,
+            routing_score=0.01,
+            reply_score=0.01,
             feedback=(
                 f"Wrong priority. Got '{action.priority}', "
                 f"expected '{ground_truth['priority']}'."
@@ -70,9 +70,10 @@ def grade_medium(action: Action, ground_truth: dict) -> Reward:
     correct_priority = action.priority == ground_truth["priority"]
     correct_dept = action.department == ground_truth["department"]
 
-    priority_score = 0.40 if correct_priority else 0.0
-    routing_score = 0.60 if correct_dept else 0.0
+    priority_score = 0.40 if correct_priority else 0.01
+    routing_score = 0.59 if correct_dept else 0.01
     total = round(priority_score + routing_score, 4)
+    total = max(0.01, min(0.99, total))
 
     parts = []
     parts.append(
@@ -88,7 +89,7 @@ def grade_medium(action: Action, ground_truth: dict) -> Reward:
         total=total,
         priority_score=priority_score,
         routing_score=routing_score,
-        reply_score=0.0,
+        reply_score=0.01,
         feedback=" | ".join(parts),
     )
 
@@ -97,14 +98,15 @@ def grade_hard(action: Action, ground_truth: dict) -> Reward:
     correct_priority = action.priority == ground_truth["priority"]
     correct_dept = action.department == ground_truth["department"]
 
-    priority_score = 0.40 if correct_priority else 0.0
-    routing_score = 0.35 if correct_dept else 0.0
+    priority_score = 0.40 if correct_priority else 0.01
+    routing_score = 0.35 if correct_dept else 0.01
     reply_score = _score_reply(
         action.reply,
         ground_truth.get("reply_keywords", []),
         ground_truth.get("body", ""),
     )
     total = round(priority_score + routing_score + reply_score, 4)
+    total = max(0.01, min(0.99, total))
 
     parts = []
     parts.append(
@@ -122,7 +124,7 @@ def grade_hard(action: Action, ground_truth: dict) -> Reward:
         total=total,
         priority_score=priority_score,
         routing_score=routing_score,
-        reply_score=reply_score,
+        reply_score=max(0.01, reply_score),
         feedback=" | ".join(parts),
     )
 
