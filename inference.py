@@ -23,11 +23,11 @@ import requests
 from openai import OpenAI
 
 
-# Config from environment variables (STRICT - NO FALLBACKS)
-API_BASE_URL = os.environ.get("API_BASE_URL")
-API_KEY      = os.environ.get("API_KEY")
-MODEL_NAME   = os.environ.get("MODEL_NAME")
-ENV_BASE_URL = os.environ.get("ENV_BASE_URL") or "http://localhost:7860"
+# Config from environment variables (Matched to Judge's Sample Script)
+API_KEY      = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
+API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
+MODEL_NAME   = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
+ENV_BASE_URL = os.getenv("ENV_BASE_URL") or "http://localhost:7860"
 
 MAX_STEPS   = 25
 TEMPERATURE = 0.1
